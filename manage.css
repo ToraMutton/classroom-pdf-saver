@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    font: 14px/1.5 system-ui, "Noto Sans JP", sans-serif;
+    color: #202124;
+    background: #f8f9fa;
+}
+
+main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+h1 {
+    font-size: 22px;
+    color: #1e8e3e;
+}
+
+h2 {
+    font-size: 16px;
+    margin: 0;
+}
+
+section {
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hint {
+    color: #5f6368;
+    font-size: 12px;
+}
+
+.empty {
+    color: #5f6368;
+}
+
+.banner {
+    background: #fef7e0;
+    border: 1px solid #f9ab00;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.banner p {
+    margin: 0 0 8px;
+}
+
+.banner.ok {
+    background: #e6f4ea;
+    border-color: #1e8e3e;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: top;
+}
+
+th {
+    font-size: 12px;
+    color: #5f6368;
+    font-weight: normal;
+}
+
+td.name {
+    word-break: break-all;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: 1px solid #dadce0;
+    background: #fff;
+    border-radius: 4px;
+    padding: 4px 12px;
+}
+
+.primary {
+    background: #1e8e3e;
+    border-color: #1e8e3e;
+    color: #fff;
+}
+
+.danger {
+    color: #d93025;
+}
+
+.granted {
+    color: #137333;
+}

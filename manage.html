@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Classroom PDF Saver - 管理</title>
+    <link rel="stylesheet" href="manage.css">
+</head>
+<body>
+    <main>
+        <h1>Classroom PDF Saver</h1>
+
+        <div id="add-banner" class="banner" hidden>
+            <p id="add-message"></p>
+            <button id="add-banner-button" class="primary">フォルダを選ぶ</button>
+        </div>
+        <div id="message" class="banner ok" hidden></div>
+
+        <section>
+            <div class="section-header">
+                <h2>保存先フォルダ</h2>
+                <button id="add-folder" class="primary">＋ フォルダを追加</button>
+            </div>
+            <p class="hint">
+                ブラウザの仕様でフルパスは表示できません（フォルダ名のみ表示されます）。
+                許可ダイアログで「毎回許可する」を選ぶと、次回以降の確認が不要になります。
+            </p>
+            <table>
+                <thead>
+                    <tr><th>フォルダ</th><th>使っている授業</th><th>最終使用</th><th>権限</th><th></th></tr>
+                </thead>
+                <tbody id="folders"></tbody>
+            </table>
+            <p id="no-folders" class="empty" hidden>まだフォルダがありません。</p>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2>保存履歴</h2>
+                <button id="clear-history">履歴をすべて消去</button>
+            </div>
+            <p class="hint">
+                履歴にあるファイルはポップアップで「保存済み」と表示され、最初はチェックが外れた状態になります。
+                削除すると次回はまた未保存として扱われます。
+            </p>
+            <table>
+                <thead>
+                    <tr><th>ファイル名</th><th>授業</th><th>保存先</th><th>日時</th><th></th></tr>
+                </thead>
+                <tbody id="history"></tbody>
+            </table>
+            <p id="no-history" class="empty" hidden>履歴はありません。</p>
+        </section>
+    </main>
+    <script type="module" src="manage.js"></script>
+</body>
+</html>

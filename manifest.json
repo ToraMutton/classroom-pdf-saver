@@ -1,32 +1,36 @@
 {
     "manifest_version": 3,
     "name": "Classroom PDF Saver",
-    "version": "1.0",
-    "description": "Google ClassroomのPDFをワンクリック保存",
+    "version": "2.0",
+    "description": "Google Classroomの資料を選んで好きなフォルダに保存",
     "permissions": [
-        "downloads",
         "activeTab",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "host_permissions": [
         "https://classroom.google.com/*",
         "https://drive.google.com/*",
-        "https://drive.usercontent.google.com/*"
+        "https://drive.usercontent.google.com/*",
+        "https://docs.google.com/*",
+        "https://*.googleusercontent.com/*"
     ],
     "action": {
-        "default_title": "PDFを保存",
+        "default_title": "資料を保存",
+        "default_popup": "popup.html",
         "default_icon": {
-            "16": "image.png",
-            "48": "image.png",
-            "128": "image.png"
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
         }
     },
-    "icons": {
-        "16": "image.png",
-        "48": "image.png",
-        "128": "image.png"
+    "options_ui": {
+        "page": "manage.html",
+        "open_in_tab": true
     },
-    "background": {
-        "service_worker": "background.js"
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
     }
 }

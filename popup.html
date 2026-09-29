@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <header>
+        <div id="course" class="course">読み込み中…</div>
+        <button id="open-manage" class="icon-button" title="フォルダと履歴の管理">⚙</button>
+    </header>
+
+    <section class="folder-row">
+        <label for="folder">保存先</label>
+        <select id="folder"></select>
+        <button id="add-folder" title="フォルダを追加">＋</button>
+    </section>
+    <div id="folder-note" class="note" hidden></div>
+
+    <section class="list-header">
+        <label><input type="checkbox" id="toggle-all"> すべて</label>
+        <span id="count" class="count"></span>
+    </section>
+    <ul id="items"></ul>
+    <div id="empty" class="note" hidden></div>
+
+    <footer>
+        <div id="status" class="status"></div>
+        <button id="save" class="primary" disabled>保存</button>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
