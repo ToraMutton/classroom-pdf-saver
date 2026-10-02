@@ -50,6 +50,25 @@
             </table>
             <p id="no-history" class="empty" hidden>履歴はありません。</p>
         </section>
+
+        <section>
+            <div class="section-header">
+                <h2>記憶したパスワード</h2>
+                <button id="clear-passwords">すべて削除</button>
+            </div>
+            <p class="hint">
+                鍵付き PDF を保存するときに「この授業のパスワードとして記憶する」を選ぶと、ここに追加されます。
+                パスワードはこのパソコンのブラウザ内にだけ保存され、Google アカウントへの同期や外部への送信はしません。
+                ただし暗号化はされないため、共用のパソコンでは記憶しないでください。
+            </p>
+            <table>
+                <thead>
+                    <tr><th>授業</th><th>パスワード</th><th></th></tr>
+                </thead>
+                <tbody id="passwords"></tbody>
+            </table>
+            <p id="no-passwords" class="empty" hidden>記憶したパスワードはありません。</p>
+        </section>
     </main>
     <script type="module" src="manage.js"></script>
 </body>

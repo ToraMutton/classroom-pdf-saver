@@ -171,6 +171,68 @@ button:disabled {
     color: var(--error);
 }
 
+.password-panel {
+    margin: 8px 12px;
+    padding: 10px;
+    border: 1px solid #f9ab00;
+    border-radius: 6px;
+    background: #fef7e0;
+}
+
+/* ポップアップの高さには上限があるので、入力中はリストを縮めて入力欄を見えるようにする */
+body:has(.password-panel:not([hidden])) #items {
+    max-height: 160px;
+}
+
+.password-title {
+    font-weight: 600;
+}
+
+.password-file {
+    margin: 2px 0 8px;
+    color: var(--muted);
+    word-break: break-all;
+}
+
+.password-form {
+    display: flex;
+    gap: 6px;
+}
+
+.password-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 6px;
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.password-message {
+    margin-top: 4px;
+    color: var(--error);
+}
+
+.password-message:empty {
+    display: none;
+}
+
+.remember {
+    margin-top: 8px;
+}
+
+.remember .hint {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.password-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+}
+
 footer {
     position: sticky;
     bottom: 0;

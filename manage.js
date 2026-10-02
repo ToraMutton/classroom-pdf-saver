@@ -111,8 +111,30 @@ async function renderHistory() {
     $('clear-history').disabled = !entries.length;
 }
 
+async function renderPasswords() {
+    const [passwords, courseNames] = await Promise.all([
+        store.getCoursePasswords(), store.getCourseNames(),
+    ]);
+    const courses = Object.keys(passwords);
+    $('passwords').replaceChildren(...courses.map(course => {
+        const tr = document.createElement('tr');
+        tr.append(
+            cell(courseNames[course] || course, 'name'),
+            // 画面には出さない（長さも分からないよう固定の伏せ字）
+            cell('••••••••'),
+            cell(button('削除', async () => {
+                await store.removeCoursePassword(course);
+                await render();
+            }, 'danger')),
+        );
+        return tr;
+    }));
+    $('no-passwords').hidden = courses.length > 0;
+    $('clear-passwords').disabled = !courses.length;
+}
+
 async function render() {
-    await Promise.all([renderFolders(), renderHistory()]);
+    await Promise.all([renderFolders(), renderHistory(), renderPasswords()]);
 }
 
 $('add-folder').addEventListener('click', pickFolder);
@@ -120,6 +142,11 @@ $('add-banner-button').addEventListener('click', pickFolder);
 $('clear-history').addEventListener('click', async () => {
     if (!confirm('保存履歴をすべて消去しますか？')) return;
     await store.clearHistory();
+    await render();
+});
+$('clear-passwords').addEventListener('click', async () => {
+    if (!confirm('記憶したパスワードをすべて削除しますか？')) return;
+    await store.clearCoursePasswords();
     await render();
 });
 

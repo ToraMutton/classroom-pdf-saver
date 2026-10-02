@@ -1,5 +1,6 @@
 import { scanPage } from './lib/scan.js';
 import { fetchItem, decideFilename, writeFile, KIND_LABEL } from './lib/download.js';
+import { needsPassword, unlockPdf } from './lib/unlock.js';
 import * as store from './lib/store.js';
 
 const $ = (id) => document.getElementById(id);
@@ -10,6 +11,8 @@ const state = {
     history: {},      // store.getHistory()
     checked: new Set(),
     saving: false,
+    passwords: [],    // 入力して鍵を外せたパスワード（ポップアップを閉じると消える）
+    answerPassword: null, // パスワード入力欄の応答を待っている Promise の resolve
 };
 
 function selectedFolder() {
@@ -147,6 +150,68 @@ function setResult(key, text, ok) {
     el.className = `result ${ok === true ? 'ok' : ok === false ? 'error' : ''}`;
 }
 
+// ---- 鍵付き PDF ----
+
+// パスワード入力欄を出して応答を待つ。
+// 戻り値: { password, remember } | { keep: true }（鍵付きのまま保存） | { skip: true }
+function askPassword(item, message) {
+    $('password-file').textContent = item.name || item.id;
+    $('password-message').textContent = message;
+    $('password').value = '';
+    $('remember-row').hidden = !state.page.courseId;
+    $('password-panel').hidden = false;
+    $('password-panel').scrollIntoView({ block: 'nearest' });
+    $('password').focus();
+    return new Promise(resolve => { state.answerPassword = resolve; });
+}
+
+function answerPassword(answer) {
+    $('password-panel').hidden = true;
+    state.answerPassword?.(answer);
+    state.answerPassword = null;
+}
+
+// 候補を順に試し、鍵を外せたら { blob, password } を返す
+async function tryPasswords(bytes, passwords) {
+    for (const password of new Set(passwords)) {
+        if (!password) continue;
+        const blob = await unlockPdf(bytes, password);
+        if (blob) return { blob, password };
+    }
+    return null;
+}
+
+// パスワードが必要な PDF なら鍵を外す。記憶したパスワード → この保存中に使ったパスワード →
+// 入力欄の順に試す。戻り値: { blob: 保存する内容, note: 結果に添える文字列 }。スキップなら null
+async function unlockIfNeeded(item, blob) {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    if (!(await needsPassword(bytes))) return { blob, note: '' };
+
+    const { courseId } = state.page;
+    const saved = await store.getCoursePassword(courseId);
+    const known = await tryPasswords(bytes, [saved, ...state.passwords]);
+    if (known) return { blob: known.blob, note: '（鍵を解除）' };
+
+    let message = saved ? '記憶したパスワードでは開けませんでした。' : '';
+    for (;;) {
+        setResult(item.key, 'パスワードを入力してください');
+        const answer = await askPassword(item, message);
+        if (answer.skip) return null;
+        if (answer.keep) return { blob, note: '（鍵付きのまま）' };
+
+        setResult(item.key, '鍵を解除中…');
+        // コピー&ペーストで前後に空白が入りやすいので、そのままで駄目なら空白を除いて試す
+        const found = await tryPasswords(bytes, [answer.password, answer.password.trim()]);
+        if (!found) {
+            message = 'パスワードが違います。';
+            continue;
+        }
+        state.passwords = [found.password, ...state.passwords.filter(p => p !== found.password)];
+        if (answer.remember) await store.setCoursePassword(courseId, found.password);
+        return { blob: found.blob, note: '（鍵を解除）' };
+    }
+}
+
 async function save() {
     const folder = selectedFolder();
     if (!folder) return;
@@ -166,17 +231,24 @@ async function save() {
     await store.touchFolder(folder.id);
 
     const targets = state.page.items.filter(i => state.checked.has(i.key));
-    let ok = 0, failed = 0;
+    let ok = 0, failed = 0, skipped = 0;
 
     for (const [i, item] of targets.entries()) {
         $('status').textContent = `保存中… ${i + 1} / ${targets.length}`;
         setResult(item.key, 'ダウンロード中…');
         try {
             const fetched = await fetchItem(item);
+            const content = await unlockIfNeeded(item, fetched.blob);
+            if (!content) {
+                // チェックは残しておき、パスワードが分かったらもう一度保存できるようにする
+                setResult(item.key, 'スキップしました');
+                skipped++;
+                continue;
+            }
             const name = decideFilename(item, fetched);
             const prev = state.history[item.key];
             const overwrite = prev?.folderId === folder.id ? prev.name : null;
-            const finalName = await writeFile(folder.handle, name, fetched.blob, overwrite);
+            const finalName = await writeFile(folder.handle, name, content.blob, overwrite);
 
             const entry = {
                 key: item.key, name: finalName, folderId: folder.id, folderName: folder.name,
@@ -185,7 +257,7 @@ async function save() {
             await store.addHistory(entry);
             state.history[item.key] = entry;
             state.checked.delete(item.key);
-            setResult(item.key, `✓ ${finalName}`, true);
+            setResult(item.key, `✓ ${finalName}${content.note}`, true);
             ok++;
         } catch (e) {
             console.error(item, e);
@@ -196,8 +268,8 @@ async function save() {
     }
 
     state.saving = false;
-    $('status').textContent = failed
-        ? `${ok} 件保存、${failed} 件失敗`
+    $('status').textContent = failed || skipped
+        ? [`${ok} 件保存`, skipped && `${skipped} 件スキップ`, failed && `${failed} 件失敗`].filter(Boolean).join('、')
         : `${ok} 件を「${folder.name}」に保存しました`;
     updateControls();
 }
@@ -215,6 +287,12 @@ async function init() {
         state.checked = e.target.checked ? new Set(state.page.items.map(i => i.key)) : new Set();
         updateControls();
     });
+    $('password-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        answerPassword({ password: $('password').value, remember: $('remember').checked });
+    });
+    $('password-keep').addEventListener('click', () => answerPassword({ keep: true }));
+    $('password-skip').addEventListener('click', () => answerPassword({ skip: true }));
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     try {

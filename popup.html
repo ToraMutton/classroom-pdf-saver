@@ -24,6 +24,24 @@
     <ul id="items"></ul>
     <div id="empty" class="note" hidden></div>
 
+    <section id="password-panel" class="password-panel" hidden>
+        <div class="password-title">🔒 パスワード付きの PDF です</div>
+        <div id="password-file" class="password-file"></div>
+        <form id="password-form" class="password-form">
+            <input type="password" id="password" placeholder="パスワード" autocomplete="off" required>
+            <button type="submit" class="primary">鍵を外して保存</button>
+        </form>
+        <div id="password-message" class="password-message"></div>
+        <div id="remember-row" class="remember">
+            <label><input type="checkbox" id="remember"> この授業のパスワードとして記憶する</label>
+            <div class="hint">このパソコンのブラウザ内にだけ保存されます（暗号化なし）。共用のパソコンでは使わないでください。</div>
+        </div>
+        <div class="password-actions">
+            <button type="button" id="password-keep">鍵付きのまま保存</button>
+            <button type="button" id="password-skip">スキップ</button>
+        </div>
+    </section>
+
     <footer>
         <div id="status" class="status"></div>
         <button id="save" class="primary" disabled>保存</button>
