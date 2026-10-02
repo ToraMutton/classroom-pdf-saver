@@ -1,0 +1,18 @@
+# Claude Code のローカル設定（コマンドの許可リストなど、個人の環境に依存するもの）
+.claude/
+
+# 拡張機能のパッケージと署名鍵（.pem は秘密鍵なので絶対に公開しない）
+*.crx
+*.pem
+*.zip
+
+# テストなどで npm パッケージを入れた場合
+node_modules/
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
